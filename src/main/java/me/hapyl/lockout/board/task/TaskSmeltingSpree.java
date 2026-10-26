@@ -36,7 +36,12 @@ public final class TaskSmeltingSpree extends TaskImpl implements Listener {
         
         final Player player = ev.getPlayer();
         
-        this.progress(player, TaskSmeltingSpreeProgress::new, progress -> progress.track(craftedItemType, player));
+        this.progress(player, this::computeProgress, progress -> progress.track(craftedItemType, player));
+    }
+    
+    @Override
+    public @NotNull TaskSmeltingSpreeProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskSmeltingSpreeProgress(task, playerTeam);
     }
     
     @Override
@@ -44,15 +49,10 @@ public final class TaskSmeltingSpree extends TaskImpl implements Listener {
         return TaskDifficulty.NORMAL;
     }
     
-    @Override
-    public @NotNull TaskSmeltingSpreeProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskSmeltingSpreeProgress(playerTeam);
-    }
-    
     public static class TaskSmeltingSpreeProgress extends TaskProgressTrackerChecklist<Material> {
         
-        TaskSmeltingSpreeProgress(@NotNull PlayerTeam team) {
-            super(team, FURNACES);
+        TaskSmeltingSpreeProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team, FURNACES);
         }
         
         @Override

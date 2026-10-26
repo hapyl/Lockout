@@ -61,16 +61,16 @@ public final class TaskFlagWeaver extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskFlagWeaverProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskFlagWeaverProgress(playerTeam);
+    public @NotNull TaskFlagWeaverProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskFlagWeaverProgress(task, playerTeam);
     }
     
     public static class TaskFlagWeaverProgress extends TaskProgress {
         
         private @Nullable PlacedBanner placedBanner;
         
-        TaskFlagWeaverProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskFlagWeaverProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

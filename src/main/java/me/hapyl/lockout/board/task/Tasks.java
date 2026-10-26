@@ -194,8 +194,8 @@ public final class Tasks {
         }
         
         @Override
-        public @NotNull TaskProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-            return new TaskProgress(playerTeam);
+        public @NotNull TaskProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            return new TaskProgress(task, playerTeam);
         }
         
     }

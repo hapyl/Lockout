@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public final class TaskTheRainbow extends TaskImpl implements Listener {
@@ -47,14 +46,14 @@ public final class TaskTheRainbow extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskTheRainbowProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskTheRainbowProgress(playerTeam);
+    public @NotNull TaskTheRainbowProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskTheRainbowProgress(task, playerTeam);
     }
  
     public static class TaskTheRainbowProgress extends TaskProgressTrackerChecklist<Material> {
         
-        TaskTheRainbowProgress(@NotNull PlayerTeam team) {
-            super(team, DYES);
+        TaskTheRainbowProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team, DYES);
         }
         
         @Override

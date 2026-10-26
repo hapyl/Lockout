@@ -58,8 +58,8 @@ public final class TaskPickupNamedItem extends TaskImpl {
     }
     
     @Override
-    public @NotNull TaskPickupNamedItemProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskPickupNamedItemProgress(playerTeam);
+    public @NotNull TaskPickupNamedItemProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskPickupNamedItemProgress(task, playerTeam);
     }
     
     @Override
@@ -112,8 +112,8 @@ public final class TaskPickupNamedItem extends TaskImpl {
         
         private @Nullable PlayerTuple<Material> picked;
         
-        TaskPickupNamedItemProgress(@NotNull PlayerTeam team) {
-            super(team);
+        TaskPickupNamedItemProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team);
         }
         
         @Override

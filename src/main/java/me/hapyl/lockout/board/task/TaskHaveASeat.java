@@ -40,16 +40,16 @@ public final class TaskHaveASeat extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskHaveASeatProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskHaveASeatProgress(playerTeam);
+    public @NotNull TaskHaveASeatProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskHaveASeatProgress(task, playerTeam);
     }
     
     public static class TaskHaveASeatProgress extends TaskProgress {
         
         private @Nullable Player player;
         
-        TaskHaveASeatProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskHaveASeatProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

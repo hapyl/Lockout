@@ -1,6 +1,5 @@
 package me.hapyl.lockout.board.task;
 
-import me.hapyl.lockout.Lockout;
 import me.hapyl.lockout.Locust;
 import me.hapyl.lockout.PlayerTeam;
 import me.hapyl.lockout.board.ProgressAccumulator;
@@ -40,16 +39,16 @@ public final class TaskLevelUp extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskLevelUpProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskLevelUpProgress(playerTeam);
+    public @NotNull TaskLevelUpProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskLevelUpProgress(task, playerTeam);
     }
     
     public static class TaskLevelUpProgress extends TaskProgress {
         
         private @Nullable Player player;
         
-        TaskLevelUpProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskLevelUpProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

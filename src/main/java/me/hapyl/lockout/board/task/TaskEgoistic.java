@@ -56,8 +56,8 @@ public final class TaskEgoistic extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskEgoisticProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskEgoisticProgress(playerTeam);
+    public @NotNull TaskEgoisticProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskEgoisticProgress(task, playerTeam);
     }
     
     private static @NotNull String normalize(@NotNull String string) {
@@ -68,8 +68,8 @@ public final class TaskEgoistic extends TaskImpl implements Listener {
         
         private @Nullable Player egoist;
         
-        TaskEgoisticProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskEgoisticProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

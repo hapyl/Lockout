@@ -55,16 +55,16 @@ public final class TaskQuietPlace extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskQuietPlaceProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskQuietPlaceProgress(playerTeam);
+    public @NotNull TaskQuietPlaceProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskQuietPlaceProgress(task, playerTeam);
     }
     
     public static class TaskQuietPlaceProgress extends TaskProgress {
         
         private @Nullable Player player;
         
-        TaskQuietPlaceProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskQuietPlaceProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

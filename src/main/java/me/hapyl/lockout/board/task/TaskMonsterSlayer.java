@@ -37,14 +37,14 @@ public final class TaskMonsterSlayer extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskMonsterSlayerProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskMonsterSlayerProgress(playerTeam);
+    public @NotNull TaskMonsterSlayerProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskMonsterSlayerProgress(task, playerTeam);
     }
     
     public static class TaskMonsterSlayerProgress extends TaskProgressTrackerUnique<EntityType> {
         
-        TaskMonsterSlayerProgress(@NotNull PlayerTeam team) {
-            super(team);
+        TaskMonsterSlayerProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team);
         }
         
         @Override

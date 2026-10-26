@@ -49,16 +49,16 @@ public final class TaskHelloMyNameIs extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskHelloMyNameIs.TaskHelloMyNameIsProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskHelloMyNameIsProgress(playerTeam);
+    public @NotNull TaskHelloMyNameIsProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskHelloMyNameIsProgress(task, playerTeam);
     }
     
     public static class TaskHelloMyNameIsProgress extends TaskProgress {
         
         private @Nullable Stamped stamped;
         
-        TaskHelloMyNameIsProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskHelloMyNameIsProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

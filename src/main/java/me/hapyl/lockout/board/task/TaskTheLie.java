@@ -42,16 +42,16 @@ public final class TaskTheLie extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskProgressTheLie computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskProgressTheLie(playerTeam);
+    public @NotNull TaskProgressTheLie computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskProgressTheLie(task, playerTeam);
     }
     
     public static class TaskProgressTheLie extends TaskProgress {
         
         private @Nullable Player whoCrafted;
         
-        TaskProgressTheLie(@NotNull PlayerTeam team) {
-            super(team);
+        TaskProgressTheLie(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team);
         }
         
         @Override

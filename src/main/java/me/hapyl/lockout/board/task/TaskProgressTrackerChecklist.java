@@ -12,8 +12,8 @@ public abstract class TaskProgressTrackerChecklist<E> extends TaskProgressTracke
     
     private final ImmutableArray<E> checklist;
     
-    TaskProgressTrackerChecklist(@NotNull PlayerTeam team, @NotNull ImmutableArray<E> checklist) {
-        super(team);
+    TaskProgressTrackerChecklist(@NotNull Task task, @NotNull PlayerTeam team, @NotNull ImmutableArray<E> checklist) {
+        super(task, team);
         
         this.checklist = checklist;
     }

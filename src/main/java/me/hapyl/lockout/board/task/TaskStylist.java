@@ -65,16 +65,16 @@ public final class TaskStylist extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskStylistProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskStylistProgress(playerTeam);
+    public @NotNull TaskStylistProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskStylistProgress(task, playerTeam);
     }
     
     public static class TaskStylistProgress extends TaskProgress {
         
         private @Nullable Stylist stylist;
         
-        TaskStylistProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskStylistProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

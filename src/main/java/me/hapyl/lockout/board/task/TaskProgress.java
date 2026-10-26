@@ -10,10 +10,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class TaskProgress implements ComponentLike {
     
+    private final Task task;
     private final PlayerTeam playerTeam;
     
-    TaskProgress(@NotNull PlayerTeam playerTeam) {
+    TaskProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        this.task = task;
         this.playerTeam = playerTeam;
+    }
+    
+    public @NotNull Task getTask() {
+        return task;
     }
     
     public @NotNull PlayerTeam getPlayerTeam() {

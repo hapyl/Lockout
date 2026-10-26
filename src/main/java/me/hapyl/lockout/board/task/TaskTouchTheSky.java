@@ -45,16 +45,16 @@ public final class TaskTouchTheSky extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskTouchTheSkyProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskTouchTheSkyProgress(playerTeam);
+    public @NotNull TaskTouchTheSkyProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskTouchTheSkyProgress(task, playerTeam);
     }
     
     public static class TaskTouchTheSkyProgress extends TaskProgress {
         
         private @Nullable Sky sky;
         
-        TaskTouchTheSkyProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskTouchTheSkyProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

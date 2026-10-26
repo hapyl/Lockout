@@ -32,14 +32,14 @@ public final class TaskSouperChef extends TaskFoodImpl {
     }
     
     @Override
-    public @NotNull TaskSouperChefProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskSouperChefProgress(playerTeam);
+    public @NotNull TaskSouperChefProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskSouperChefProgress(task, playerTeam);
     }
     
     public static class TaskSouperChefProgress extends TaskProgressTrackerChecklist<Material> {
         
-        TaskSouperChefProgress(@NotNull PlayerTeam team) {
-            super(team, SOUPS);
+        TaskSouperChefProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team, SOUPS);
         }
         
         @Override

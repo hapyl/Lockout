@@ -18,7 +18,7 @@ public abstract class TaskFoodImpl extends TaskImpl {
     }
     
     @Override
-    public abstract @NotNull TaskProgress computeProgress(@NotNull PlayerTeam playerTeam);
+    public abstract @NotNull TaskProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam);
     
     @Override
     public @NotNull TaskCategory getCategory() {

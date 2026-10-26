@@ -13,8 +13,8 @@ import java.util.Map;
 
 public abstract class TaskProgressTrackerUnique<E> extends TaskProgressTracker<E> {
     
-    TaskProgressTrackerUnique(@NotNull PlayerTeam team) {
-        super(team);
+    TaskProgressTrackerUnique(@NotNull Task task, @NotNull PlayerTeam team) {
+        super(task, team);
     }
     
     @Override

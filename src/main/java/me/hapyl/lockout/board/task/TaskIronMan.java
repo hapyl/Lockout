@@ -60,8 +60,8 @@ public final class TaskIronMan extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskIronManProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskIronManProgress(playerTeam);
+    public @NotNull TaskIronManProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskIronManProgress(task, playerTeam);
     }
     
     @Override
@@ -73,8 +73,8 @@ public final class TaskIronMan extends TaskImpl implements Listener {
         
         private @Nullable Player builder;
         
-        TaskIronManProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskIronManProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

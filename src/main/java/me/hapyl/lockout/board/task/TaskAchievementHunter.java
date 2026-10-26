@@ -40,14 +40,14 @@ public final class TaskAchievementHunter extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskAchievementHunterProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskAchievementHunterProgress(playerTeam);
+    public @NotNull TaskAchievementHunterProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskAchievementHunterProgress(task, playerTeam);
     }
     
     public static class TaskAchievementHunterProgress extends TaskProgressTrackerUnique<NamespacedKey> {
         
-        TaskAchievementHunterProgress(@NotNull PlayerTeam team) {
-            super(team);
+        TaskAchievementHunterProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team);
         }
         
         @Override

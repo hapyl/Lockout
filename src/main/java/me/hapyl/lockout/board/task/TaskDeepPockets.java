@@ -46,16 +46,16 @@ public final class TaskDeepPockets extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskDeepPocketProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskDeepPocketProgress(playerTeam);
+    public @NotNull TaskDeepPocketProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskDeepPocketProgress(task, playerTeam);
     }
     
     public static class TaskDeepPocketProgress extends TaskProgress {
         
         private @Nullable PlayerTuple<Material> mined;
         
-        TaskDeepPocketProgress(@NotNull PlayerTeam team) {
-            super(team);
+        TaskDeepPocketProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team);
         }
         
         @Override

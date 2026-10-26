@@ -27,16 +27,6 @@ public final class TaskMannequin extends TaskImpl implements Listener {
         super(key, Icon.ofMaterial(Material.ARMOR_STAND), Component.text("Mannequin"), Component.text("Equip a full set of armor on an Armor Stand."));
     }
     
-    @Override
-    public @NotNull TaskMannequinProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskMannequinProgress(playerTeam);
-    }
-    
-    @Override
-    public @NotNull TaskDifficulty getDifficulty() {
-        return TaskDifficulty.NORMAL;
-    }
-    
     @EventHandler(ignoreCancelled = true)
     public void handlePlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent ev) {
         final ArmorStand armorStand = ev.getRightClicked();
@@ -66,13 +56,23 @@ public final class TaskMannequin extends TaskImpl implements Listener {
         });
     }
     
+    @Override
+    public @NotNull TaskMannequinProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskMannequinProgress(task, playerTeam);
+    }
+    
+    @Override
+    public @NotNull TaskDifficulty getDifficulty() {
+        return TaskDifficulty.NORMAL;
+    }
+    
     public static class TaskMannequinProgress extends TaskProgress {
         
         private @NotNull Material @Nullable [] armorContents;
         private @Nullable Player player;
         
-        TaskMannequinProgress(@NotNull PlayerTeam team) {
-            super(team);
+        TaskMannequinProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team);
         }
         
         @Override

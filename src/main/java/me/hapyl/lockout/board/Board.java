@@ -1,6 +1,7 @@
 package me.hapyl.lockout.board;
 
 import com.google.common.collect.Maps;
+import com.google.gson.JsonParseException;
 import io.papermc.paper.registry.keys.SoundEventKeys;
 import me.hapyl.lockout.Colors;
 import me.hapyl.lockout.Lockout;
@@ -9,11 +10,16 @@ import me.hapyl.lockout.PlayerTeam;
 import me.hapyl.lockout.board.task.Task;
 import me.hapyl.lockout.board.task.TaskProgress;
 import me.hapyl.lockout.mode.LockoutMode;
+import me.hapyl.lockout.util.ComponentList;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.bossbar.BossBarViewer;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -24,8 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.UnaryOperator;
 
 public class Board implements Runnable {
     
@@ -72,27 +77,12 @@ public class Board implements Runnable {
         player.hideBossBar(bossBar);
     }
     
-    public @NotNull Map<? extends PlayerTeam, ? extends Integer> calculateTeamPoints() {
-        final Map<PlayerTeam, Integer> teamPoints = PlayerTeam.nonEmptyTeams()
-                                                              .collect(Collectors.toMap(Function.identity(), _ -> 0, (a, b) -> a, () -> Maps.newEnumMap(PlayerTeam.class)));
-        
-        for (BoardTask task : tasks.values()) {
-            final PlayerTeam completionTeam = task.getCompletionTeam();
-            
-            if (completionTeam != null) {
-                teamPoints.merge(completionTeam, 1, Integer::sum);
-            }
-        }
-        
-        // Sort the map from highest to lowest points
-        return teamPoints.entrySet()
-                         .stream()
-                         .sorted(Map.Entry.<PlayerTeam, Integer>comparingByValue().reversed())
-                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
+    public @NotNull List<? extends PlayerTeamInfo> playerTeamInfo() {
+        return PlayerTeam.nonEmptyTeams().map(playerTeam -> PlayerTeamInfo.create(this, playerTeam)).sorted().toList();
     }
     
-    public int calculateTeamPoints(@NotNull PlayerTeam playerTeam) {
-        return tasks.values().stream().filter(task -> task.getCompletionTeam() == playerTeam).mapToInt(task -> task.getTask().getDifficulty().getPoints()).sum();
+    public @NotNull PlayerTeamInfo playerTeamInfo(@NotNull PlayerTeam playerTeam) {
+        return PlayerTeamInfo.create(this, playerTeam);
     }
     
     public void onFinished() {
@@ -110,20 +100,13 @@ public class Board implements Runnable {
         everyone.sendMessage(Component.empty());
         
         // Calculate points and award winners
-        final Map<? extends PlayerTeam, ? extends Integer> teamPoints = this.calculateTeamPoints();
+        final List<? extends PlayerTeamInfo> playerTeamInfos = this.playerTeamInfo();
         
-        if (teamPoints.isEmpty()) {
+        if (playerTeamInfos.isEmpty()) {
             everyone.sendMessage(Component.text("No one completed any tasks, yuk.", Colors.DARK_GRAY));
         }
         else {
-            teamPoints.forEach((playerTeam, points) -> {
-                everyone.sendMessage(
-                        Component.empty()
-                                 .append(Component.text("  "))
-                                 .append(playerTeam.asComponentWithPlayers())
-                                 .append(Component.text("   %s".formatted(points), Colors.WHITE, TextDecoration.BOLD))
-                );
-            });
+            playerTeamInfos.forEach(playerTeamInfo -> everyone.sendMessage(Component.space().append(playerTeamInfo)));
         }
         
         everyone.sendMessage(Component.empty());
@@ -374,5 +357,77 @@ public class Board implements Runnable {
             return Component.empty();
         }
         
+    }
+    
+    public static class PlayerTeamInfo implements ComponentLike, Comparable<PlayerTeamInfo> {
+        
+        // We sort player team info by points
+        private final int points;
+        private final Component component;
+        
+        PlayerTeamInfo(@NotNull PlayerTeam playerTeam, int points, @NotNull List<? extends TaskProgress> completedTasks) {
+            this.points = points;
+            this.component = createComponent(playerTeam, points).hoverEvent(createHoverEvent(completedTasks));
+        }
+        
+        @Override
+        public @NotNull Component asComponent() {
+            return component;
+        }
+        
+        @Override
+        public int compareTo(@NotNull Board.PlayerTeamInfo that) {
+            return Double.compare(that.points, this.points);
+        }
+        
+        static @NotNull PlayerTeamInfo create(@NotNull Board board, @NotNull PlayerTeam playerTeam) {
+            final List<? extends BoardTask> tasksCompletedByTeam = board.tasks.values().stream().filter(task -> task.getCompletionTeam() == playerTeam).toList();
+            
+            if (tasksCompletedByTeam.isEmpty()) {
+                return new PlayerTeamInfo(playerTeam, 0, List.of());
+            }
+            
+            return new PlayerTeamInfo(
+                    playerTeam,
+                    tasksCompletedByTeam.stream().mapToInt(task -> task.getTask().getDifficulty().getPoints()).sum(),
+                    tasksCompletedByTeam.stream().map(task -> task.getProgress(playerTeam)).toList()
+            );
+        }
+        
+        private static @NotNull Component createComponent(@NotNull PlayerTeam playerTeam, int points) {
+            return Component.empty()
+                            .append(playerTeam.asComponentWithPlayers())
+                            .append(Component.text("  "))
+                            .append(Component.text(points, Colors.WHITE, TextDecoration.BOLD));
+        }
+        
+        private static @NotNull HoverEvent<Component> createHoverEvent(@NotNull List<? extends TaskProgress> completedTasks) {
+            final TextComponent.Builder builder = Component.text();
+            
+            for (int i = 0; i < completedTasks.size(); i++) {
+                if (i != 0) {
+                    builder.appendNewline().appendNewline();
+                }
+                
+                final TaskProgress taskProgress = completedTasks.get(i);
+                final ComponentList components = taskProgress.getComponents();
+                
+                if (components != null) {
+                    builder.append(taskProgress.getTask().getName().color(Colors.WHITE).decorate(TextDecoration.BOLD)).appendNewline();
+                    
+                    int j = 0;
+                    for (Component component : components) {
+                        if (j++ != 0) {
+                            builder.appendNewline();
+                        }
+                        
+                        builder.append(Component.space().append(component.color(Colors.GRAY)));
+                    }
+                }
+            }
+            
+            
+            return HoverEvent.showText(builder);
+        }
     }
 }

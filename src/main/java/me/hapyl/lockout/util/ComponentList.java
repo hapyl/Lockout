@@ -7,10 +7,11 @@ import net.kyori.adventure.text.JoinConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ComponentList implements ComponentLike {
+public class ComponentList implements ComponentLike, Iterable<Component> {
     
     private final List<Component> components;
     
@@ -51,6 +52,11 @@ public class ComponentList implements ComponentLike {
     
     public @NotNull List<? extends Component> asList() {
         return components; // Care to copy?
+    }
+    
+    @Override
+    public @NotNull Iterator<Component> iterator() {
+        return components.iterator();
     }
     
     private @NotNull ComponentList append0(@NotNull Component component) {

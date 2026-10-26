@@ -42,16 +42,16 @@ public final class TaskTombRaider extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskTombRaiderProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskTombRaiderProgress(playerTeam);
+    public @NotNull TaskTombRaiderProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskTombRaiderProgress(task, playerTeam);
     }
     
     public static class TaskTombRaiderProgress extends TaskProgress {
         
         private @Nullable Raider raider;
         
-        TaskTombRaiderProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskTombRaiderProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

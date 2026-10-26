@@ -21,16 +21,6 @@ public final class TaskTryNotToDieChallenge extends TaskImpl implements Listener
         super(key, Icon.ofMaterial(Material.SKELETON_SKULL), Component.text("Try Not to Die Challenge"), Component.text("Die in %s different ways.".formatted(UNIQUE_WAYS_TO_DIE)));
     }
     
-    @Override
-    public @NotNull TaskTryNotToDieChallengeProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskTryNotToDieChallengeProgress(playerTeam);
-    }
-    
-    @Override
-    public @NotNull TaskDifficulty getDifficulty() {
-        return TaskDifficulty.HARD;
-    }
-    
     @EventHandler(ignoreCancelled = true)
     public void handleEntityDeathEvent(EntityDeathEvent ev) {
         if (!(ev.getEntity() instanceof Player player)) {
@@ -40,10 +30,20 @@ public final class TaskTryNotToDieChallenge extends TaskImpl implements Listener
         this.progress(player, this::computeProgress, progress -> progress.track(ev.getDamageSource().getDamageType(), player));
     }
     
+    @Override
+    public @NotNull TaskTryNotToDieChallengeProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskTryNotToDieChallengeProgress(task, playerTeam);
+    }
+    
+    @Override
+    public @NotNull TaskDifficulty getDifficulty() {
+        return TaskDifficulty.HARD;
+    }
+    
     public static class TaskTryNotToDieChallengeProgress extends TaskProgressTrackerUnique<DamageType> {
         
-        TaskTryNotToDieChallengeProgress(@NotNull PlayerTeam team) {
-            super(team);
+        TaskTryNotToDieChallengeProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team);
         }
         
         @Override

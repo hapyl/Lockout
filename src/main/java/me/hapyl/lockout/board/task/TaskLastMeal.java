@@ -6,10 +6,6 @@ import me.hapyl.lockout.util.ImmutableArray;
 import me.hapyl.lockout.util.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public final class TaskLastMeal extends TaskFoodImpl {
@@ -36,14 +32,14 @@ public final class TaskLastMeal extends TaskFoodImpl {
     }
     
     @Override
-    public @NotNull TaskLastMealProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskLastMealProgress(playerTeam);
+    public @NotNull TaskLastMealProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskLastMealProgress(task, playerTeam);
     }
     
     public static class TaskLastMealProgress extends TaskProgressTrackerChecklist<Material> {
         
-        TaskLastMealProgress(@NotNull PlayerTeam team) {
-            super(team, FOODS);
+        TaskLastMealProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team, FOODS);
         }
         
         @Override

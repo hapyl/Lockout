@@ -24,14 +24,14 @@ public final class TaskLockedAndLoaded extends TaskImpl {
     }
     
     @Override
-    public @NotNull TaskLockedAndLoadedProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskLockedAndLoadedProgress(playerTeam);
+    public @NotNull TaskLockedAndLoadedProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskLockedAndLoadedProgress(task, playerTeam);
     }
     
     public static class TaskLockedAndLoadedProgress extends TaskProgressTrackerChecklist<Material> {
         
-        TaskLockedAndLoadedProgress(@NotNull PlayerTeam team) {
-            super(team, IRON_TOOLS);
+        TaskLockedAndLoadedProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team, IRON_TOOLS);
         }
         
         @Override

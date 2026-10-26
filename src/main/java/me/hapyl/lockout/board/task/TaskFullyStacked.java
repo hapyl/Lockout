@@ -42,16 +42,16 @@ public final class TaskFullyStacked extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskFullyStackedProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskFullyStackedProgress(playerTeam);
+    public @NotNull TaskFullyStackedProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskFullyStackedProgress(task, playerTeam);
     }
     
     public static class TaskFullyStackedProgress extends TaskProgress {
         
         private @Nullable PlayerTuple<Material> material;
         
-        TaskFullyStackedProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskFullyStackedProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

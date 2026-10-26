@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,11 +53,7 @@ public class BoardTask implements ComponentLike {
     }
     
     public @NotNull TaskProgress getProgress(@NotNull PlayerTeam playerTeam) {
-        return getProgress0(playerTeam, _ -> task.computeProgress(playerTeam));
-    }
-    
-    public boolean hasProgress(@NotNull PlayerTeam team) {
-        return progressMap.containsKey(team);
+        return getProgress0(playerTeam, task::computeProgress);
     }
     
     public @Nullable PlayerTeam getCompletionTeam() {
@@ -73,12 +68,12 @@ public class BoardTask implements ComponentLike {
     }
     
     @SuppressWarnings("unchecked")
-    private <P extends TaskProgress> @NotNull P getProgress0(@NotNull PlayerTeam team, @NotNull ProgressConstructor<P> constructor) {
-        return (P) progressMap.computeIfAbsent(team, _ -> constructor.construct(team));
+    private <P extends TaskProgress> @NotNull P getProgress0(@NotNull PlayerTeam playerTeam, @NotNull ProgressConstructor<P> constructor) {
+        return (P) progressMap.computeIfAbsent(playerTeam, _ -> constructor.construct(task, playerTeam));
     }
     
     private static @NotNull Map<PlayerTeam, TaskProgress> precomputeProgress(@NotNull Task task, @NotNull Stream<? extends PlayerTeam> playerTeams) {
-        return playerTeams.collect(Collectors.toMap(Function.identity(), task::computeProgress));
+        return playerTeams.collect(Collectors.toMap(Function.identity(), playerTeam -> task.computeProgress(task, playerTeam)));
     }
     
     public enum ProgressResponse {

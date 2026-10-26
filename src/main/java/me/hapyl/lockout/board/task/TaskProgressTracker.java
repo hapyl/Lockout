@@ -18,8 +18,8 @@ public abstract class TaskProgressTracker<E> extends TaskProgress {
     
     protected final Map<E, Player> tracked;
     
-    TaskProgressTracker(@NotNull PlayerTeam team) {
-        super(team);
+    TaskProgressTracker(@NotNull Task task, @NotNull PlayerTeam team) {
+        super(task, team);
         
         this.tracked = Maps.newLinkedHashMap();
     }

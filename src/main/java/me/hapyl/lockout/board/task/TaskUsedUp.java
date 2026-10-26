@@ -33,16 +33,16 @@ public final class TaskUsedUp extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskUsedUpProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskUsedUpProgress(playerTeam);
+    public @NotNull TaskUsedUpProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskUsedUpProgress(task, playerTeam);
     }
     
     public static class TaskUsedUpProgress extends TaskProgress {
         
         private @Nullable PlayerTuple<Material> broken;
         
-        TaskUsedUpProgress(@NotNull PlayerTeam team) {
-            super(team);
+        TaskUsedUpProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team);
         }
         
         @Override

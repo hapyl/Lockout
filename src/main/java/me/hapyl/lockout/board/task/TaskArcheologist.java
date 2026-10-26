@@ -1,7 +1,5 @@
 package me.hapyl.lockout.board.task;
 
-import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
-import me.hapyl.lockout.Logger;
 import me.hapyl.lockout.PlayerTeam;
 import me.hapyl.lockout.board.ProgressAccumulator;
 import me.hapyl.lockout.util.*;
@@ -15,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,16 +59,16 @@ public final class TaskArcheologist extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskArcheologistProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskArcheologistProgress(playerTeam);
+    public @NotNull TaskArcheologistProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskArcheologistProgress(task, playerTeam);
     }
     
     public static class TaskArcheologistProgress extends TaskProgress {
         
         private @Nullable PlayerTuple<Material> sherd;
         
-        TaskArcheologistProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskArcheologistProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

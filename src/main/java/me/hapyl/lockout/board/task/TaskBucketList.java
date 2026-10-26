@@ -1,7 +1,5 @@
 package me.hapyl.lockout.board.task;
 
-import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
-import me.hapyl.lockout.Logger;
 import me.hapyl.lockout.PlayerTeam;
 import me.hapyl.lockout.util.Icon;
 import me.hapyl.lockout.util.ImmutableArray;
@@ -51,14 +49,14 @@ public final class TaskBucketList extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskBucketListProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskBucketListProgress(playerTeam);
+    public @NotNull TaskBucketListProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskBucketListProgress(task, playerTeam);
     }
     
     public static class TaskBucketListProgress extends TaskProgressTrackerChecklist<Material> {
         
-        TaskBucketListProgress(@NotNull PlayerTeam team) {
-            super(team, BUCKETS);
+        TaskBucketListProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team, BUCKETS);
         }
         
         @Override

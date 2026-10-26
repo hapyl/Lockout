@@ -13,7 +13,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public interface Task extends Named, Described, ItemCreator {
     
@@ -25,7 +24,7 @@ public interface Task extends Named, Described, ItemCreator {
     @Override
     @NotNull Component getDescription();
     
-    @NotNull TaskProgress computeProgress(@NotNull PlayerTeam playerTeam);
+    @NotNull TaskProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam);
     
     default @NotNull TaskDifficulty getDifficulty() {
         return TaskDifficulty.EASY;

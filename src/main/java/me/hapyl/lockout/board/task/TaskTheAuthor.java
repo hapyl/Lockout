@@ -45,16 +45,16 @@ public final class TaskTheAuthor extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskTheAuthorProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskTheAuthorProgress(playerTeam);
+    public @NotNull TaskTheAuthorProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskTheAuthorProgress(task, playerTeam);
     }
     
     public static class TaskTheAuthorProgress extends TaskProgress {
         
         private @Nullable PlayerTuple<String> signed;
         
-        TaskTheAuthorProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskTheAuthorProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

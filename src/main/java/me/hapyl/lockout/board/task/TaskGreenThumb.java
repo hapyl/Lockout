@@ -48,16 +48,16 @@ public final class TaskGreenThumb extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskGreenThumbProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskGreenThumbProgress(playerTeam);
+    public @NotNull TaskGreenThumbProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskGreenThumbProgress(task, playerTeam);
     }
     
     public static class TaskGreenThumbProgress extends TaskProgress {
         
         private @Nullable PlayerTuple<Material> planter;
         
-        TaskGreenThumbProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskGreenThumbProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

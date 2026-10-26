@@ -26,8 +26,8 @@ public final class TaskRoyalDinner extends TaskFoodImpl {
     }
     
     @Override
-    public @NotNull TaskRoyalDinnerProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskRoyalDinnerProgress(playerTeam);
+    public @NotNull TaskRoyalDinnerProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskRoyalDinnerProgress(task, playerTeam);
     }
     
     @Override
@@ -37,8 +37,8 @@ public final class TaskRoyalDinner extends TaskFoodImpl {
     
     public static class TaskRoyalDinnerProgress extends TaskProgressTrackerChecklist<Material> {
         
-        TaskRoyalDinnerProgress(@NotNull PlayerTeam team) {
-            super(team, FOODS);
+        TaskRoyalDinnerProgress(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team, FOODS);
         }
         
         @Override

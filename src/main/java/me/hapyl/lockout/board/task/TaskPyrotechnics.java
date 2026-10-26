@@ -49,16 +49,16 @@ public final class TaskPyrotechnics extends TaskImpl implements Listener {
     }
     
     @Override
-    public @NotNull TaskPyrotechnicsProgress computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskPyrotechnicsProgress(playerTeam);
+    public @NotNull TaskPyrotechnicsProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskPyrotechnicsProgress(task, playerTeam);
     }
     
     public static class TaskPyrotechnicsProgress extends TaskProgress {
         
         private @Nullable Player player;
         
-        TaskPyrotechnicsProgress(@NotNull PlayerTeam playerTeam) {
-            super(playerTeam);
+        TaskPyrotechnicsProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+            super(task, playerTeam);
         }
         
         @Override

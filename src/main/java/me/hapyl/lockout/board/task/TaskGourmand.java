@@ -3,14 +3,8 @@ package me.hapyl.lockout.board.task;
 import me.hapyl.lockout.PlayerTeam;
 import me.hapyl.lockout.util.Icon;
 import me.hapyl.lockout.util.Key;
-import me.hapyl.lockout.util.MonitorEventListener;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public final class TaskGourmand extends TaskFoodImpl {
@@ -26,14 +20,14 @@ public final class TaskGourmand extends TaskFoodImpl {
     }
     
     @Override
-    public @NotNull TaskProgressGourmand computeProgress(@NotNull PlayerTeam playerTeam) {
-        return new TaskProgressGourmand(playerTeam);
+    public @NotNull TaskProgressGourmand computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
+        return new TaskProgressGourmand(task, playerTeam);
     }
     
     public static class TaskProgressGourmand extends TaskProgressTrackerUnique<Material> {
         
-        TaskProgressGourmand(@NotNull PlayerTeam team) {
-            super(team);
+        TaskProgressGourmand(@NotNull Task task, @NotNull PlayerTeam team) {
+            super(task, team);
         }
         
         @Override
