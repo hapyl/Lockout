@@ -2,7 +2,6 @@ package me.hapyl.lockout.command;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.LiteralMessage;
-import com.mojang.brigadier.Message;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -12,7 +11,11 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
+import me.hapyl.lockout.board.task.Task;
+import me.hapyl.lockout.board.task.Tasks;
+import me.hapyl.lockout.util.Key;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -53,9 +56,11 @@ public abstract class Arguments<E> implements CustomArgumentType<E, String> {
         return new ArgumentsEnumImpl<>(enumClass);
     }
     
+    public static @NotNull ArgumentType<Task> tasks() {
+        return new ArgumentsTasks();
+    }
+    
     public static class ArgumentsEnumImpl<E extends Enum<E>> extends Arguments<E> {
-        
-        private static final DynamicCommandExceptionType EXCEPTION_TYPE = new DynamicCommandExceptionType(object -> new LiteralMessage("Unknown argument: " + object));
         
         private final Map<String, E> enumConstantsMapped;
         
@@ -69,13 +74,49 @@ public abstract class Arguments<E> implements CustomArgumentType<E, String> {
                 return e;
             }
             
-            throw EXCEPTION_TYPE.create(string);
+            throw Exceptions.EXCEPTION_UNKNOWN_ELEMENT.create(string);
         }
         
         @Override
         public @NotNull Iterable<? extends String> suggestions() {
             return enumConstantsMapped.keySet();
         }
+        
+    }
+    
+    private static class ArgumentsTasks extends Arguments<Task> {
+        
+        private static final @Unmodifiable Map<? extends Key, ? extends Task> TASKS = Tasks.tasks();
+        private static final @Unmodifiable List<? extends String> SUGGESTIONS = Tasks.tasks().keySet().stream().map(Key::toString).toList();
+        
+        @Override
+        public @NotNull Task parse(@NotNull String string) throws CommandSyntaxException {
+            final Key key = Key.ofStringOrNull(string);
+            
+            if (key == null) {
+               throw Exceptions.EXCEPTION_UNKNOWN_ELEMENT.create(string);
+            }
+            
+            final Task task = TASKS.get(key);
+            
+            if (task == null) {
+                throw Exceptions.EXCEPTION_UNKNOWN_ELEMENT.create(string);
+            }
+            
+            return task;
+        }
+        
+        @Override
+        public @NotNull Iterable<? extends String> suggestions() {
+            return SUGGESTIONS;
+        }
+        
+    }
+    
+    public static class Exceptions {
+        
+        public static final DynamicCommandExceptionType EXCEPTION_UNKNOWN_ELEMENT = new DynamicCommandExceptionType(object -> new LiteralMessage("Unknown argument: " + object));
+        
         
     }
     

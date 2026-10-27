@@ -7,11 +7,13 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import me.hapyl.lockout.Colors;
 import me.hapyl.lockout.Lockout;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.object.ObjectContents;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -60,6 +62,8 @@ public class ItemBuilder {
             DataComponentTypes.INSTRUMENT
     );
     
+    private static final Key NAMESPACE = Key.key("items");
+    
     private final ItemStack itemStack;
     
     public ItemBuilder(@NotNull Material material) {
@@ -90,7 +94,7 @@ public class ItemBuilder {
     }
     
     public @NotNull ItemBuilder addWrappedLore(@NotNull Component component) {
-        return addLore(wrap(component));
+        return addLore(wrap(component, WRAP_LENGTH));
     }
     
     public @NotNull ItemStack build() {
@@ -139,6 +143,10 @@ public class ItemBuilder {
     
     public @NotNull ItemBuilder glow() {
         return editMeta(meta -> meta.setEnchantmentGlintOverride(true));
+    }
+    
+    public @NotNull Component sprite() {
+        return Component.object(ObjectContents.sprite(NAMESPACE, Key.key("item/" + itemStack.getType().getKey().getKey())));
     }
     
     public static @NotNull ItemBuilder builder(@NotNull Material material) {
@@ -200,7 +208,7 @@ public class ItemBuilder {
         
     }
     
-    private static @NotNull List<? extends Component> wrap(@NotNull Component component) {
+    public static @NotNull List<? extends Component> wrap(@NotNull Component component, int maxLength) {
         if (!(component instanceof TextComponent)) {
             return List.of(component);
         }
@@ -245,7 +253,7 @@ public class ItemBuilder {
                 
                 // If `counter` + `length` will overflow, wrap on the next line,
                 // unless we're on a whitespace
-                if (counter + length > WRAP_LENGTH && !group.isBlank()) {
+                if (counter + length > maxLength && !group.isBlank()) {
                     output.add(builder.build());
                     
                     builder = Component.text();

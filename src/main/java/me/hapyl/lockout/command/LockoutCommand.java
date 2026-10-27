@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public interface LockoutCommand {
     
@@ -26,7 +25,7 @@ public interface LockoutCommand {
     class Requires {
         
         public static final Predicate<CommandSourceStack> OPERATOR = context -> context.getSender().isOp();
-        public static final Predicate<CommandSourceStack> NO_BOARD = _ -> Lockout.getBoard() == null;
+        public static final Predicate<CommandSourceStack> NO_BOARD = _ -> Lockout.board() == null;
         
         @SafeVarargs
         public static @NotNull Predicate<CommandSourceStack> allOf(@NotNull Predicate<CommandSourceStack>... many) {

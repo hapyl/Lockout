@@ -40,6 +40,9 @@ public final class Colors {
     public static final TextColor BUTTON_SHIFT_RIGHT = TextColor.color(0x1FA3A3);
     public static final TextColor BUTTON_MIDDLE = TextColor.color(0xE070FF);
     
+    public static final TextColor PIN = TextColor.color(0xE53333);
+    public static final TextColor BRAND_COLOR = TextColor.color(0xEF4444);
+    
     private Colors() {
     }
     

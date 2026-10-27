@@ -8,6 +8,8 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,6 +19,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Collection;
@@ -38,20 +41,42 @@ public final class ServerHandler implements Listener {
     public void handlePlayerJoinEvent(PlayerJoinEvent ev) {
         ev.joinMessage(null);
         
-        // Find a team to join
         final Player player = ev.getPlayer();
-        final PlayerTeam smallestTeam = PlayerTeam.getSmallestTeam();
+        final Board board = Lockout.board();
         
-        if (smallestTeam == null) {
-            Locust.kickPlayer(player, Component.text("The server is full!"));
-            return;
-        }
+        final Component playerNameFormatted = Locust.formatPlayerName(player);
         
-        smallestTeam.join(player);
-        
-        // If board exists, call update on it
-        if (Lockout.getBoard() instanceof Board board) {
+        // Handle in-game logic
+        if (board != null) {
+            final PlayerTeam existingTeam = PlayerTeam.getPlayerTeam(player).orElse(null);
+            
+            // If player do not have an existing team, it means they newly joined instead of re-joining the game, put the in a spectator
+            if (existingTeam == null) {
+                player.setGameMode(GameMode.SPECTATOR);
+                player.sendMessage(Component.text("You are currently spectating!", Colors.GREEN));
+            }
+            // Otherwise tell that player has rejoined
+            else {
+                ev.joinMessage(playerNameFormatted.append(Component.text(" has rejoined!", Colors.YELLOW)));
+            }
+            
+            // Call update on the board
             board.onPlayerJoin(player);
+        }
+        // Handle pre-game logic
+        else {
+            // Find a team to join
+            final PlayerTeam smallestTeam = PlayerTeam.getSmallestTeam();
+            
+            if (smallestTeam == null) {
+                Locust.kickPlayer(player, Component.text("The server is full!"));
+                return;
+            }
+            
+            smallestTeam.join(player);
+            
+            // Set join message
+            ev.joinMessage(playerNameFormatted.append(Component.text(" has joined!", Colors.YELLOW)));
         }
     }
     
@@ -60,13 +85,23 @@ public final class ServerHandler implements Listener {
         ev.quitMessage(null);
         
         final Player player = ev.getPlayer();
+        final Board board = Lockout.board();
         
-        // Remove player from the team
-        PlayerTeam.getPlayerTeam(player).ifPresent(playerTeam -> playerTeam.leave(player));
+        final Component playerNameFormatted = Locust.formatPlayerName(player);
         
-        // If board exists, call update on it
-        if (Lockout.getBoard() instanceof Board board) {
+        // Handle in-game logic
+        if (board != null) {
+            ev.quitMessage(playerNameFormatted.append(Component.text(" left; they may re-join and continue playing!", Colors.YELLOW)));
+            
             board.onPlayerQuit(player);
+        }
+        // Handle pre-game logic
+        else {
+            // Set quit message before removing player from a team
+            ev.quitMessage(playerNameFormatted.append(Component.text(" left!", Colors.YELLOW)));
+            
+            // Remove player from the team
+            PlayerTeam.getPlayerTeam(player).ifPresent(playerTeam -> playerTeam.leave(player));
         }
     }
     
@@ -89,7 +124,7 @@ public final class ServerHandler implements Listener {
         final Collection<? extends Player> recipients;
         
         if (isTeamMessage) {
-            message = Component.empty().append(PREFIX_TEAM_CHAT).appendSpace().append(playerNameFormatted).append(originalMessage.replaceText(builder -> builder.match(PATTERN_TEAM_MESSAGE).replacement("")).style(STYLE_MESSAGE_TEAM));
+            message = Component.empty().append(PREFIX_TEAM_CHAT).appendSpace().append(playerNameFormatted).appendSpace().append(originalMessage.replaceText(builder -> builder.match(PATTERN_TEAM_MESSAGE).replacement("")).style(STYLE_MESSAGE_TEAM));
             recipients = PlayerTeam.getPlayerTeam(player).orElse(PlayerTeam.RED).players().toList();
         }
         else {
@@ -139,8 +174,24 @@ public final class ServerHandler implements Listener {
         }
     }
     
+    @EventHandler
+    public void handlePlayerMoveEvent(PlayerMoveEvent ev) {
+        // If the game is currently frozen, do not allow player movement
+        if (Bukkit.getServerTickManager().isFrozen()) {
+            final Location from = ev.getFrom();
+            final Location to = ev.getTo();
+            
+            // Don't cancel mouse movements
+            if (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ()) {
+                return;
+            }
+            
+            ev.setCancelled(true);
+        }
+    }
+    
     private static boolean isPregame() {
-        final Board board = Lockout.getBoard();
+        final Board board = Lockout.board();
         
         return board == null || !board.hasStarted();
     }

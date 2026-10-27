@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-/* Represents a Lockout Utility Helper class */
+/* Represents a LOCkout Utility STatic helper class */
 public final class Locust {
     
     public static final Component CHECKMARK_TRUE = Component.text("✔", Colors.GREEN);

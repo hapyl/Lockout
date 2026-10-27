@@ -36,7 +36,7 @@ public interface Task extends Named, Described, ItemCreator {
     
     @ApiStatus.NonExtendable
     default <P extends TaskProgress> void progress(@NotNull Player player, @NotNull ProgressConstructor<P> constructor, @NotNull ProgressAccumulator<P> accumulator) {
-        final Board board = Lockout.getBoard();
+        final Board board = Lockout.board();
         
         if (board == null) {
             return;

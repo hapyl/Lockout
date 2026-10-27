@@ -1,13 +1,13 @@
 package me.hapyl.lockout.mode;
 
+import me.hapyl.lockout.util.Tick;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 public class LockoutModeTimeLimitImpl extends LockoutModeImpl {
     
-    private static final int MINUTES_TO_TICKS_RATIO = 1200;
-    
-    LockoutModeTimeLimitImpl(int minutes) {
-        super(Component.text("Time Limit (%s)".formatted(minutes)), minutes * MINUTES_TO_TICKS_RATIO);
+    LockoutModeTimeLimitImpl(@NotNull Tick timeLimit, @NotNull Tick gracePeriod) {
+        super(Component.text("Time Limit (%s)".formatted(timeLimit.minutes())), timeLimit, gracePeriod);
     }
     
 }

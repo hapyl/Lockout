@@ -20,7 +20,7 @@ public final class LockoutCommandTeam implements LockoutCommand {
                                return 0;
                            }
                            
-                           if (Lockout.getBoard() != null) {
+                           if (Lockout.board() != null) {
                                player.sendMessage(Component.text("Cannot switch teams while in the game!", Colors.ERROR));
                                return 0;
                            }

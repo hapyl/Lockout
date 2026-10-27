@@ -10,6 +10,7 @@ import me.hapyl.lockout.util.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -52,6 +53,7 @@ public final class Tasks {
     public static final Task ACHIEVEMENT_HUNTER;
     public static final Task GREEN_THUMB;
     public static final Task LEVEL_UP;
+    public static final Task ONE_MANS_TRASH;
     
     private static final Map<Key, Task> REGISTRY;
     private static final Map<? extends TaskDifficulty, ? extends List<? extends Task>> BY_DIFFICULTY;
@@ -95,12 +97,17 @@ public final class Tasks {
         ACHIEVEMENT_HUNTER = register("achievement_hunter", TaskAchievementHunter::new);
         GREEN_THUMB = register("green_thumb", TaskGreenThumb::new);
         LEVEL_UP = register("level_up", TaskLevelUp::new);
+        ONE_MANS_TRASH = register("one_mans_trash", TaskOneMansTrash::new);
         
         // Group tasks by the difficulty
         BY_DIFFICULTY = REGISTRY.values().stream().collect(Collectors.groupingBy(Task::getDifficulty, Collectors.toList()));
     }
     
     private Tasks() {
+    }
+    
+    public static @NotNull Map<? extends Key, ? extends Task> tasks() {
+        return Map.copyOf(REGISTRY);
     }
     
     public static @NotNull List<? extends Task> generateTasks() {
@@ -150,13 +157,6 @@ public final class Tasks {
         throw new IllegalStateException("There isn't enough tasks to generate! (%s/%s)".formatted(tasks.size(), Board.BOARD_SIZE));
     }
     
-    @Deprecated(forRemoval = true)
-    private static void registerRandTask() {
-        final Key key = Key.ofRandom();
-        
-        REGISTRY.put(key, new RandTask(key));
-    }
-    
     private static void validateThereIsEnoughTasksToGenerateTheBoard() {
         for (Map.Entry<? extends TaskDifficulty, ? extends List<? extends Task>> entry : BY_DIFFICULTY.entrySet()) {
             final TaskDifficulty difficulty = entry.getKey();
@@ -165,7 +165,8 @@ public final class Tasks {
             final long size = tasks.stream()
                                    .collect(Collectors.groupingBy(Task::getCategory, Collectors.counting()))
                                    .entrySet()
-                                   .stream().mapToLong(group -> Math.min(group.getKey().getMaximumNumberOfTasks(), group.getValue()))
+                                   .stream()
+                                   .mapToLong(group -> Math.min(group.getKey().getMaximumNumberOfTasks(), group.getValue()))
                                    .sum();
             
             if (size < difficulty.getMaximumNumberOfTasks()) {
@@ -185,19 +186,6 @@ public final class Tasks {
         REGISTRY.put(theKey, task);
         
         return task;
-    }
-    
-    public static class RandTask extends TaskImpl {
-        
-        RandTask(@NotNull Key key) {
-            super(key, Icon.ofMaterial(Material.STONE), Component.text(Lockout.random().nextGaussian()), Component.text("Random"));
-        }
-        
-        @Override
-        public @NotNull TaskProgress computeProgress(@NotNull Task task, @NotNull PlayerTeam playerTeam) {
-            return new TaskProgress(task, playerTeam);
-        }
-        
     }
     
 }

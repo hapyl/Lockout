@@ -51,7 +51,12 @@ public final class Key implements Comparable<Key> {
     }
     
     public static @Nullable Key ofStringOrNull(@NotNull String string) {
-        return isValidString(string) ? new Key(string) : null;
+        try {
+            return Key.ofString(string);
+        }
+        catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
     
     public static @NotNull Key ofRandom() {

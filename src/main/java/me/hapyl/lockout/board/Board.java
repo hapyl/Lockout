@@ -1,16 +1,13 @@
 package me.hapyl.lockout.board;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonParseException;
 import io.papermc.paper.registry.keys.SoundEventKeys;
-import me.hapyl.lockout.Colors;
-import me.hapyl.lockout.Lockout;
-import me.hapyl.lockout.Locust;
-import me.hapyl.lockout.PlayerTeam;
+import me.hapyl.lockout.*;
 import me.hapyl.lockout.board.task.Task;
 import me.hapyl.lockout.board.task.TaskProgress;
 import me.hapyl.lockout.mode.LockoutMode;
 import me.hapyl.lockout.util.ComponentList;
+import me.hapyl.lockout.util.ItemBuilder;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.bossbar.BossBarViewer;
@@ -19,7 +16,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -30,18 +26,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
-import java.util.function.UnaryOperator;
 
-public class Board implements Runnable {
+public class Board implements Runnable, TablistHandler {
     
     public static final int BOARD_SIZE = 25;
-    public static final int GRACE_PERIOD = 600;
     
     public static final int WORLD_BORDER_SIZE_PREGAME = 20;
     public static final int WORLD_BORDER_SIZE = 5000;
     public static final int WORLD_BORDER_TIME = 1200;
-    
-    public static final int DEFAULT_TIME_LIMIT_IN_MINUTES = 30;
     
     public static final Sound SOUND_TASK_PROGRESSED = Sound.sound(SoundEventKeys.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.UI, 3, 1.0f);
     public static final Sound SOUND_TASK_COMPLETED_OWN_TEAM = Sound.sound(SoundEventKeys.ENTITY_PLAYER_LEVELUP, Sound.Source.UI, 3, 1.25f);
@@ -54,11 +46,12 @@ public class Board implements Runnable {
     private final LockoutMode lockoutMode;
     private final Map<Task, BoardTask> tasks;
     private final BossBar bossBar;
+    private final Map<Player, PinnedTasks> pinnedTasks;
     
     private int tick;
     private @NotNull Board.State state;
     
-    public Board(@NotNull LockoutMode lockoutMode, @NotNull Collection<? extends Task> tasks) {
+    public Board(@NotNull LockoutMode lockoutMode, @NotNull List<? extends Task> tasks) {
         if (tasks.size() != BOARD_SIZE) {
             throw new IllegalArgumentException("There must be exactly %s tasks, not %s!".formatted(BOARD_SIZE, tasks.size()));
         }
@@ -67,6 +60,11 @@ public class Board implements Runnable {
         this.tasks = generateTaskProgress(tasks);
         this.bossBar = createBossBar();
         this.state = State.STARTING;
+        this.pinnedTasks = Maps.newHashMap();
+    }
+    
+    public @NotNull PinnedTasks getPinnedTasks(@NotNull Player player) {
+        return pinnedTasks.computeIfAbsent(player, _ -> new PinnedTasks(player, this));
     }
     
     public void onPlayerJoin(@NotNull Player player) {
@@ -103,7 +101,7 @@ public class Board implements Runnable {
         final List<? extends PlayerTeamInfo> playerTeamInfos = this.playerTeamInfo();
         
         if (playerTeamInfos.isEmpty()) {
-            everyone.sendMessage(Component.text("No one completed any tasks, yuk.", Colors.DARK_GRAY));
+            everyone.sendMessage(Component.text("No one completed any tasks, yuk :/", Colors.DARK_GRAY));
         }
         else {
             playerTeamInfos.forEach(playerTeamInfo -> everyone.sendMessage(Component.space().append(playerTeamInfo)));
@@ -139,8 +137,10 @@ public class Board implements Runnable {
     
     @Override
     public void run() {
+        final int gracePeriod = lockoutMode.gracePeriod().ticks();
+        
         if (state == State.STARTING) {
-            if (tick > GRACE_PERIOD) {
+            if (tick > gracePeriod) {
                 this.setState(State.IN_PROGRESS);
                 this.tick = 0;
                 
@@ -148,11 +148,11 @@ public class Board implements Runnable {
                 return;
             }
             
-            bossBar.progress(clamp01f(1 - (float) tick / GRACE_PERIOD));
-            bossBar.name(state.bossBarName(GRACE_PERIOD - tick));
+            bossBar.progress(clamp01f(1 - (float) tick / gracePeriod));
+            bossBar.name(state.bossBarName(gracePeriod - tick));
         }
         else if (state == State.IN_PROGRESS) {
-            final int timeLimit = lockoutMode.timeLimit();
+            final int timeLimit = lockoutMode.timeLimit().ticks();
             
             if (tick > timeLimit) {
                 this.setState(State.FINISHED);
@@ -167,11 +167,44 @@ public class Board implements Runnable {
         tick++;
     }
     
+    @Override
+    public void tablistFooter(@NotNull Player player, @NotNull ComponentList footer) {
+        // Show pinned tasks
+        footer.append(Component.text("ᴘɪɴɴᴇᴅ ᴛᴀꜱᴋꜱ", Colors.GOLD, TextDecoration.BOLD));
+        footer.append();
+        
+        final PinnedTasks pinnedTasks = getPinnedTasks(player);
+        final PlayerTeam playerTeam = PlayerTeam.getPlayerTeam(player).orElse(PlayerTeam.RED);
+        
+        if (pinnedTasks.getTasks().isEmpty()) {
+            footer.append(Component.text("None!", Colors.DARK_GRAY));
+        }
+        else {
+            int i = 0;
+            
+            for (BoardTask boardTask : pinnedTasks.getTasks()) {
+                if (i++ != 0) {
+                    footer.append();
+                }
+                
+                final Task task = boardTask.getTask();
+                final TaskProgress progress = boardTask.getProgress(playerTeam);
+                
+                footer.append(task.getName().color(Colors.YELLOW).appendSpace().append(progress));
+                footer.append(task.getDescription().color(Colors.GRAY));
+            }
+        }
+    }
+    
     public @NotNull @Unmodifiable List<? extends BoardTask> getTasks() {
         return List.copyOf(tasks.values());
     }
     
     public <P extends TaskProgress> void progressTask(@NotNull Player player, @NotNull Task task, @NotNull ProgressConstructor<P> constructor, @NotNull ProgressAccumulator<P> accumulator) {
+        if (isPlayerInvalid(player)) {
+            return;
+        }
+        
         final BoardTask boardTask = this.tasks.get(task);
         
         if (boardTask == null) {
@@ -244,15 +277,6 @@ public class Board implements Runnable {
         this.bossBar.color(state.bossBarColor());
     }
     
-    private @NotNull BossBar createBossBar() {
-        final BossBar bossBar = BossBar.bossBar(Component.empty(), 1.0f, BossBar.Color.YELLOW, BossBar.Overlay.NOTCHED_10);
-        
-        // Show the boss bar to all online players
-        Bukkit.getOnlinePlayers().forEach(bossBar::addViewer);
-        
-        return bossBar;
-    }
-    
     public static @NotNull Component formatTick(int tick) {
         if (tick <= 0) {
             return COMPONENT_INFINITY_CHAR;
@@ -276,6 +300,26 @@ public class Board implements Runnable {
         return Component.text("%d.%02ds".formatted(seconds, tick * 50 % 1000 / 10));
     }
     
+    private static boolean isPlayerInvalid(@NotNull Player player) {
+        if (player.getGameMode() == GameMode.SPECTATOR) {
+            return true;
+        }
+        else if (PlayerTeam.getPlayerTeam(player).isEmpty()) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private static @NotNull BossBar createBossBar() {
+        final BossBar bossBar = BossBar.bossBar(Component.empty(), 1.0f, BossBar.Color.YELLOW, BossBar.Overlay.NOTCHED_10);
+        
+        // Show the boss bar to all online players
+        Bukkit.getOnlinePlayers().forEach(bossBar::addViewer);
+        
+        return bossBar;
+    }
+    
     private static void handleStateChangeToInProgress() {
         final World world = Lockout.world();
         
@@ -293,7 +337,7 @@ public class Board implements Runnable {
         });
     }
     
-    private static @NotNull @Unmodifiable Map<Task, BoardTask> generateTaskProgress(@NotNull Collection<? extends Task> tasks) {
+    private static @NotNull @Unmodifiable Map<Task, BoardTask> generateTaskProgress(@NotNull Iterable<? extends Task> tasks) {
         final Map<Task, BoardTask> outTask = Maps.newLinkedHashMapWithExpectedSize(BOARD_SIZE);
         
         // Get non-empty teams
@@ -426,8 +470,8 @@ public class Board implements Runnable {
                 }
             }
             
-            
             return HoverEvent.showText(builder);
         }
     }
+    
 }
