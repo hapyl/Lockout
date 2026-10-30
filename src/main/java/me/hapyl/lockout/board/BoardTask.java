@@ -17,12 +17,14 @@ import java.util.stream.Stream;
 
 public class BoardTask implements ComponentLike {
     
+    private final Board board;
     private final Task task;
     private final Map<PlayerTeam, TaskProgress> progressMap;
     
     private @Nullable PlayerTeam completionTeam;
     
-    public BoardTask(@NotNull Task task, @NotNull List<? extends PlayerTeam> playerTeams) {
+    BoardTask(@NotNull Board board, @NotNull Task task, @NotNull List<? extends PlayerTeam> playerTeams) {
+        this.board = board;
         this.task = task;
         this.progressMap = precomputeProgress(task, playerTeams.stream());
     }
@@ -47,6 +49,7 @@ public class BoardTask implements ComponentLike {
             case SKIP -> ProgressResponse.FAILED_TO_PROGRESS_SKIPPED;
             case COMPLETE -> {
                 this.completionTeam = team;
+                this.board.onTaskCompleted(this, team);
                 yield ProgressResponse.SUCCESSFULLY_COMPLETED;
             }
         };

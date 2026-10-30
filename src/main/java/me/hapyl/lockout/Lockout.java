@@ -48,6 +48,11 @@ public final class Lockout implements Runnable {
     
     @Override
     public void run() {
+        // If the server is paused, don't run
+        if (Bukkit.getServerTickManager().isFrozen()) {
+            return;
+        }
+        
         if (currentBoard != null) {
             currentBoard.run();
             

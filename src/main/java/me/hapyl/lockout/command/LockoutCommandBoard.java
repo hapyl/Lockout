@@ -33,7 +33,7 @@ public final class LockoutCommandBoard implements LockoutCommand {
     
     private static final List<? extends Task> TASKS_HARDCODED = List.of(
             Tasks.LEVEL_UP, Tasks.ROYAL_DINNER, Tasks.SOUPER_CHEF, Tasks.HAVE_A_SEAT, Tasks.ONE_MANS_TRASH,
-            Tasks.MANNEQUIN, Tasks.TRY_NOT_TO_DIE_CHALLENGE, Tasks.DEEP_POCKETS, Tasks.LOCKED_AND_LOADED, Tasks.FULLY_STACKED,
+            Tasks.FULL_INVENTORY, Tasks.FIELD_SURVEY, Tasks.DEEP_POCKETS, Tasks.LOCKED_AND_LOADED, Tasks.FULLY_STACKED,
             Tasks.PICKUP_NAMED_ITEM_B, Tasks.PICKUP_NAMED_ITEM_C, Tasks.PICKUP_NAMED_ITEM_G, Tasks.PICKUP_NAMED_ITEM_L, Tasks.PICKUP_NAMED_ITEM_P,
             Tasks.TOUCH_THE_SKY, Tasks.BUCKET_LIST, Tasks.THE_AUTHOR, Tasks.HELLO_MY_NAME_IS, Tasks.FLAG_WEAVER,
             Tasks.EGOISTIC, Tasks.IRON_MAN, Tasks.ARCHEOLOGIST, Tasks.TOMB_RAIDER, Tasks.THE_RAINBOW
@@ -64,6 +64,8 @@ public final class LockoutCommandBoard implements LockoutCommand {
                                                            
                                                            switch (generatorType) {
                                                                case NATURAL -> {
+                                                                   // TODO (xanyjl @ Thursday, October 29) -> Add a team check because players who joined during the game don't have a team assigned to them
+                                                                   
                                                                    sender.sendMessage(Component.text("Generating board naturally...", Colors.YELLOW));
                                                                    
                                                                    Lockout.board(new Board(LockoutMode.timeLimit(LockoutMode.DEFAULT_TIME_LIMIT), Tasks.generateTasks()));
@@ -107,7 +109,7 @@ public final class LockoutCommandBoard implements LockoutCommand {
                                            
                                            // Notify before freezing/unfreezing
                                            if (newValue) {
-                                               Locust.everyone().showTitle(Title.title(Component.empty(), Component.text("ᴘᴀᴜꜱᴇᴅ", Colors.YELLOW, TextDecoration.BOLD), 0, 20, 0));
+                                               Locust.everyone().showTitle(Title.title(Component.text("⏸", Colors.YELLOW), Component.text("ᴘᴀᴜꜱᴇᴅ", Colors.YELLOW, TextDecoration.BOLD), 0, Integer.MAX_VALUE, 0));
                                            }
                                            else {
                                                Locust.everyone().clearTitle();

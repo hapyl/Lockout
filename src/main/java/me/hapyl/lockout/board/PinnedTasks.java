@@ -23,6 +23,10 @@ public class PinnedTasks {
         this.tasks = Lists.newArrayList();
     }
     
+    public @NotNull Player getPlayer() {
+        return player;
+    }
+    
     public @NotNull List<? extends BoardTask> getTasks() {
         return tasks;
     }
@@ -38,6 +42,10 @@ public class PinnedTasks {
         
         tasks.add(task);
         return true;
+    }
+    
+    public boolean unpin(@NotNull BoardTask boardTask) {
+        return tasks.remove(boardTask);
     }
     
 }

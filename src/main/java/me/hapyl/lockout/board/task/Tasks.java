@@ -9,6 +9,7 @@ import me.hapyl.lockout.util.Icon;
 import me.hapyl.lockout.util.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.jetbrains.annotations.Debug;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -54,9 +55,13 @@ public final class Tasks {
     public static final Task GREEN_THUMB;
     public static final Task LEVEL_UP;
     public static final Task ONE_MANS_TRASH;
+    public static final Task FULL_INVENTORY;
+    public static final Task FIELD_SURVEY;
     
     private static final Map<Key, Task> REGISTRY;
     private static final Map<? extends TaskDifficulty, ? extends List<? extends Task>> BY_DIFFICULTY;
+    
+    private static boolean DEBUG_CHECKED_FOR_TASKS;
     
     static {
         REGISTRY = Maps.newHashMap();
@@ -98,6 +103,8 @@ public final class Tasks {
         GREEN_THUMB = register("green_thumb", TaskGreenThumb::new);
         LEVEL_UP = register("level_up", TaskLevelUp::new);
         ONE_MANS_TRASH = register("one_mans_trash", TaskOneMansTrash::new);
+        FULL_INVENTORY = register("full_inventory", TaskFullInventory::new);
+        FIELD_SURVEY = register("field_survey", TaskFieldSurvey::new);
         
         // Group tasks by the difficulty
         BY_DIFFICULTY = REGISTRY.values().stream().collect(Collectors.groupingBy(Task::getDifficulty, Collectors.toList()));
@@ -111,7 +118,8 @@ public final class Tasks {
     }
     
     public static @NotNull List<? extends Task> generateTasks() {
-        if (true) {
+        if (!DEBUG_CHECKED_FOR_TASKS) {
+            DEBUG_CHECKED_FOR_TASKS = true;
             validateThereIsEnoughTasksToGenerateTheBoard();
         }
         

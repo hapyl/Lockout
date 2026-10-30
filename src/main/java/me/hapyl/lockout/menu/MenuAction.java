@@ -33,7 +33,6 @@ public interface MenuAction {
             return mapAction(ClickType.LEFT, playerAction);
         }
         
-        
         public @NotNull Builder right(@NotNull PlayerAction playerAction) {
             return mapAction(ClickType.RIGHT, playerAction);
         }

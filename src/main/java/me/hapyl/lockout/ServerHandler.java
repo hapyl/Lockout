@@ -178,11 +178,9 @@ public final class ServerHandler implements Listener {
     public void handlePlayerMoveEvent(PlayerMoveEvent ev) {
         // If the game is currently frozen, do not allow player movement
         if (Bukkit.getServerTickManager().isFrozen()) {
-            final Location from = ev.getFrom();
-            final Location to = ev.getTo();
             
             // Don't cancel mouse movements
-            if (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ()) {
+            if (!ev.hasChangedPosition()) {
                 return;
             }
             
@@ -193,7 +191,7 @@ public final class ServerHandler implements Listener {
     private static boolean isPregame() {
         final Board board = Lockout.board();
         
-        return board == null || !board.hasStarted();
+        return board == null || !board.hasStarted() || Bukkit.getServerTickManager().isFrozen();
     }
     
 }

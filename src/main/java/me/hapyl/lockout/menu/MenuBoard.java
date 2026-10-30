@@ -27,7 +27,7 @@ public final class MenuBoard extends Menu {
     
     private static final Sound SOUND_PINNED = Sound.sound(SoundEventKeys.ENTITY_BLAZE_HURT, Sound.Source.UI, 3, 1.25f);
     private static final Sound SOUND_UNPINNED = Sound.sound(SoundEventKeys.ENTITY_BLAZE_HURT, Sound.Source.UI, 3, 0.75f);
-    private static final Sound SOUND_CANNOT_PIN_LIMIT_REACHED = Sound.sound(SoundEventKeys.ENTITY_VILLAGER_NO, Sound.Source.UI, 3, 1.0f);
+    private static final Sound SOUND_CANNOT_PIN = Sound.sound(SoundEventKeys.ENTITY_VILLAGER_NO, Sound.Source.UI, 3, 1.0f);
     
     public MenuBoard(@NotNull Player player) {
         super(player, Component.text("Lockout Board"), 5);
@@ -111,24 +111,30 @@ public final class MenuBoard extends Menu {
                     builder.build(),
                     MenuAction.builder()
                               .right(player -> {
+                                  if (boardTask.getCompletionTeam() != null) {
+                                      player.sendMessage(Component.text("Cannot pin completed tasks!", Colors.RED));
+                                      player.playSound(SOUND_CANNOT_PIN);
+                                      return;
+                                  }
+                                  
                                   if (pinnedTasks.getTasks().size() >= PinnedTasks.PIN_LIMIT) {
                                       player.sendMessage(Component.text("Cannot pin more than %s tasks!".formatted(PinnedTasks.PIN_LIMIT), Colors.RED));
-                                      player.playSound(SOUND_CANNOT_PIN_LIMIT_REACHED);
+                                      player.playSound(SOUND_CANNOT_PIN);
+                                      return;
                                   }
-                                  else {
-                                      final boolean pinned = pinnedTasks.pin(boardTask);
-                                      
-                                      player.sendMessage(
-                                              Component.empty()
-                                                       .append(pinned ? Component.text("Pinned", Colors.GREEN) : Component.text("Un-pinned", Colors.GREEN))
-                                                       .appendSpace()
-                                                       .append(boardTask.asComponent().color(Colors.GOLD))
-                                                       .appendSpace()
-                                                       .append(Component.text("task!", Colors.GREEN))
-                                      );
-                                      
-                                      player.playSound(pinned ? SOUND_PINNED : SOUND_UNPINNED);
-                                  }
+                                  
+                                  final boolean pinned = pinnedTasks.pin(boardTask);
+                                  
+                                  player.sendActionBar(
+                                          Component.empty()
+                                                   .append(Component.text(pinned ? "Pinned" : "Un-pinned", Colors.GREEN))
+                                                   .appendSpace()
+                                                   .append(boardTask.asComponent().color(Colors.GOLD))
+                                                   .appendSpace()
+                                                   .append(Component.text("task!", Colors.GREEN))
+                                  );
+                                  
+                                  player.playSound(pinned ? SOUND_PINNED : SOUND_UNPINNED);
                                   
                                   this.openMenu();
                               })

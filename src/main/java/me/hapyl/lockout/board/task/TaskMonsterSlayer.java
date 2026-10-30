@@ -1,5 +1,6 @@
 package me.hapyl.lockout.board.task;
 
+import me.hapyl.lockout.Locust;
 import me.hapyl.lockout.PlayerTeam;
 import me.hapyl.lockout.util.EntityTags;
 import me.hapyl.lockout.util.Icon;
@@ -18,7 +19,7 @@ public final class TaskMonsterSlayer extends TaskImpl implements Listener {
     public static final int NUMBER_OF_MONSTERS_TO_KILL = 5;
     
     TaskMonsterSlayer(@NotNull Key key) {
-        super(key, Icon.ofMaterial(Material.ZOMBIE_HEAD), Component.text("Monster Slayer"), Component.text("Kill %s unique monsters.".formatted(NUMBER_OF_MONSTERS_TO_KILL)));
+        super(key, Icon.ofMaterial(Material.ZOMBIE_HEAD), Component.text("Monster Slayer"), Component.text("Kill %s unique monsters.".formatted(Locust.numberToString(NUMBER_OF_MONSTERS_TO_KILL))));
     }
     
     @EventHandler(ignoreCancelled = true)

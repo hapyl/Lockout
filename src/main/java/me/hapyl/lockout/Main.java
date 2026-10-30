@@ -1,6 +1,7 @@
 package me.hapyl.lockout;
 
 import me.hapyl.lockout.command.CommandRegistry;
+import me.hapyl.lockout.event.PlayerSpyglassEntityEvent;
 import me.hapyl.lockout.menu.MenuHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRules;

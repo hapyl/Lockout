@@ -7,7 +7,6 @@ import me.hapyl.lockout.board.task.Task;
 import me.hapyl.lockout.board.task.TaskProgress;
 import me.hapyl.lockout.mode.LockoutMode;
 import me.hapyl.lockout.util.ComponentList;
-import me.hapyl.lockout.util.ItemBuilder;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.bossbar.BossBarViewer;
@@ -57,7 +56,7 @@ public class Board implements Runnable, TablistHandler {
         }
         
         this.lockoutMode = lockoutMode;
-        this.tasks = generateTaskProgress(tasks);
+        this.tasks = generateTaskProgress(this, tasks);
         this.bossBar = createBossBar();
         this.state = State.STARTING;
         this.pinnedTasks = Maps.newHashMap();
@@ -73,6 +72,22 @@ public class Board implements Runnable, TablistHandler {
     
     public void onPlayerQuit(@NotNull Player player) {
         player.hideBossBar(bossBar);
+    }
+    
+    public void onTaskCompleted(@NotNull BoardTask boardTask, @NotNull PlayerTeam team) {
+        // Unpin the task for all players
+        pinnedTasks.values().forEach(pinnedTasks -> {
+            if (pinnedTasks.unpin(boardTask)) {
+                final Player player = pinnedTasks.getPlayer();
+                
+                player.sendActionBar(
+                        Component.empty()
+                                 .append(Component.text("Task ", Colors.GREEN))
+                                 .append(boardTask.asComponent().color(Colors.GOLD))
+                                 .append(Component.text(" was un-pinned because it was completed!", Colors.GREEN))
+                );
+            }
+        });
     }
     
     public @NotNull List<? extends PlayerTeamInfo> playerTeamInfo() {
@@ -337,7 +352,7 @@ public class Board implements Runnable, TablistHandler {
         });
     }
     
-    private static @NotNull @Unmodifiable Map<Task, BoardTask> generateTaskProgress(@NotNull Iterable<? extends Task> tasks) {
+    private static @NotNull @Unmodifiable Map<Task, BoardTask> generateTaskProgress(@NotNull Board board, @NotNull Iterable<? extends Task> tasks) {
         final Map<Task, BoardTask> outTask = Maps.newLinkedHashMapWithExpectedSize(BOARD_SIZE);
         
         // Get non-empty teams
@@ -345,7 +360,7 @@ public class Board implements Runnable, TablistHandler {
         
         // Fill the map with empty progress
         for (Task task : tasks) {
-            outTask.put(task, new BoardTask(task, nonEmptyTeams));
+            outTask.put(task, new BoardTask(board, task, nonEmptyTeams));
         }
         
         return outTask;

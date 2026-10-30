@@ -16,7 +16,6 @@ public class CommandRegistry {
         this.main = main;
         
         this.main.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
-            register(event, LockoutCommandWorld::new);
             register(event, LockoutCommandBoard::new);
             register(event, LockoutCommandTeam::new);
         });
